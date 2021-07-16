@@ -1,0 +1,16 @@
+{% load bootstrap4 %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Зарегистрироваться</title>
+</head>
+<body>
+<h4>Новая страница</h4>
+<form  method="POST">
+    {% csrf_token %}
+{% bootstrap_form form layout='horizontal' %}
+{% buttons submit='Зарегистрироваться'%}{% endbuttons %}
+</form >
+</body>
+</html>
