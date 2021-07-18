@@ -7,6 +7,7 @@ from django.contrib import messages
 
 
 class RegisterUserForm(forms.ModelForm):
+    """ Регистрация юзера через фронт , валидация пароля и Почта gmail.com и icloud.com не принимается """
     username = forms.CharField(max_length=25,label='Username')
     email = forms.EmailField(max_length=100, help_text='Почта gmail.com и icloud.com не принимается',
                              label='Адресс электроной почты')

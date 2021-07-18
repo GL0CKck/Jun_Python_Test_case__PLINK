@@ -1,15 +1,17 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 from .models import AdvUser,UserIp
-
+from django import forms
 
 class AdvUserIpSerializer(serializers.ModelSerializer):
+    """usual serializer for userip"""
     class Meta:
         model = UserIp
         fields = ('ip','user','count_post','count_get')
 
 
 class AdvUserSerializer(serializers.ModelSerializer):
+    """usual serializer for user"""
     absuser = serializers.StringRelatedField(read_only=True)
 
     class Meta:
@@ -18,7 +20,8 @@ class AdvUserSerializer(serializers.ModelSerializer):
 
 
 class RegisterUserSerializer(serializers.ModelSerializer):
-    password=serializers.CharField(max_length=16,min_length=7,write_only=True)
+    """ регистрация нового юзера (пароль,токен)"""
+    password=serializers.CharField(max_length=16,min_length=7,write_only=True,widget=forms.PasswordInput)
 
     token=serializers.CharField(max_length=255,read_only=True)
 
@@ -31,6 +34,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 
 
 class LoginUserSerializer(serializers.Serializer):
+    """ Аутентификация юзера с токеном"""
     email=serializers.EmailField(write_only=True)
     password=serializers.CharField(max_length=128,write_only=True)
 
@@ -38,6 +42,7 @@ class LoginUserSerializer(serializers.Serializer):
     token=serializers.CharField(max_length=255,read_only=True)
 
     def validate(self,data):
+        """ валидация ввода"""
         email=data.get('email',None)
         password=data.get('password',None)
 

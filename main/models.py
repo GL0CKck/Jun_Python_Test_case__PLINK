@@ -8,6 +8,7 @@ from django.conf import settings
 
 
 class UserManager(BaseUserManager):
+    """ model манаджер который будет управлять объектами """
     def _create_user(self,username,email,password=None,**extra_fields):
         if not username:
             raise ValueError('UserNameValuerError')
@@ -22,12 +23,14 @@ class UserManager(BaseUserManager):
         return user
 
     def create_user(self,username,email,password=None,**extra_fields):
+        """ create user"""
         extra_fields.setdefault('is_staff',False)
         extra_fields.setdefault('is_superuser',False)
 
         return self._create_user(username,email,password,**extra_fields)
 
     def create_superuser(self,username,email,password=None,**extra_fields):
+        """ create superuser"""
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
@@ -40,6 +43,7 @@ class UserManager(BaseUserManager):
 
 
 class AdvUser(AbstractBaseUser,PermissionsMixin):
+    """ model создание юзера унаследовав от AbstractBaseUser,PermissionsMixin, """
     username = models.CharField(db_index=True, max_length=255, unique=True)
 
     email = models.EmailField(
@@ -47,6 +51,7 @@ class AdvUser(AbstractBaseUser,PermissionsMixin):
         unique=True,
         blank=False
     )
+
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     USERNAME_FIELD = 'email'
@@ -80,6 +85,7 @@ class AdvUser(AbstractBaseUser,PermissionsMixin):
 
 
 class UserIp(models.Model):
+    """ модель сохраняет айпи юзера и счетчик методов"""
     user = models.ForeignKey(AdvUser,on_delete=models.CASCADE,verbose_name='user')
     ip = models.CharField(max_length=100)
     count_post = models.PositiveIntegerField(default=0,verbose_name='POST')
@@ -90,3 +96,7 @@ class UserIp(models.Model):
 
     class Meta:
         pass
+
+
+class UserNotes(models.Model):
+    pass

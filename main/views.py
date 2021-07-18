@@ -20,6 +20,7 @@ from django.shortcuts import get_object_or_404
 
 
 def index(request):
+    """ Запрос просто возращает главную страницу сохраняет ip-user и считает сколько запросов было сделано"""
     if request.method == 'GET' and request.user.is_authenticated:
         user = request.user
         ip=get_client_ip(request)
@@ -35,6 +36,7 @@ def index(request):
 
 
 def registeruserview(request):
+    """ ендпоинт регистрации юзера через фронт и сохранение его в БД"""
     if request.method == 'POST':
         form=RegisterUserForm(request.POST)
         if form.is_valid():
@@ -49,6 +51,7 @@ def registeruserview(request):
 
 
 def get_client_ip(request):
+    """ Получаем ip-user """
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
         ip = x_forwarded_for.split(',')[0]
@@ -60,6 +63,8 @@ def get_client_ip(request):
 @api_view(['GET','POST','DELETE'])
 @permission_classes((IsAuthenticatedOrReadOnly,))
 def api_users(request):
+    """ endpoint serializer выдает инф. о юзере в методе GET , в методе POST можем добавить нового юзера,
+     в методе DELETE удалить"""
     users = AdvUser.objects.all()
     if request.method=='GET':
         serializer=AdvUserSerializer(users,many=True)
@@ -78,6 +83,7 @@ def api_users(request):
 @api_view(['GET'])
 @permission_classes((IsAuthenticatedOrReadOnly,))
 def api_usersip(request):
+    """ endpoint UserIp and count methods"""
     if request.method=='GET':
         users=UserIp.objects.all()
         serializer=AdvUserIpSerializer(users,many=True)
@@ -90,44 +96,48 @@ def api_usersip(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ApiAdvUser(ModelViewSet):
-    queryset = AdvUser.objects.all()
-    serializer_class = AdvUserSerializer
+# class ApiAdvUser(ModelViewSet):
+#     """ """
+#     queryset = AdvUser.objects.all()
+#     serializer_class = AdvUserSerializer
 
 
 class UserLoginView(LoginView):
-
+    """ endpoint logging on web-site """
     template_name = 'login.html'
 
 
 @login_required
 def profile(request):
+    """ endpoint profile-user """
     user=get_object_or_404(AdvUser,pk=request.user.pk)
     context={'user':user}
     return render(request,'profile.html',context)
 
 
 class UserLogoutView(LoginRequiredMixin,LogoutView):
+    """endpoint logout user"""
     template_name = 'logout.html'
 
 
-class UserProfileCreateView(ListCreateAPIView):
-    queryset = AdvUser.objects.all()
-    serializer_class = AdvUserSerializer
-    permission_classes=[IsAuthenticated]
-
-    def perform_create(self, serializer):
-        user=self.request.user
-        serializer.save(user=user)
-
-
-class UserProfileDetailView(RetrieveUpdateDestroyAPIView):
-    queryset = AdvUser.objects.all()
-    serializer_class = AdvUserSerializer
-    permission_classes=[IsOwnerProfileOrReadOnly,IsAuthenticated]
+# class UserProfileCreateView(ListCreateAPIView):
+#     queryset = AdvUser.objects.all()
+#     serializer_class = AdvUserSerializer
+#     permission_classes=[IsAuthenticated]
+#
+#     def perform_create(self, serializer):
+#         user=self.request.user
+#         serializer.save(user=user)
+#
+#
+# class UserProfileDetailView(RetrieveUpdateDestroyAPIView):
+#     queryset = AdvUser.objects.all()
+#     serializer_class = AdvUserSerializer
+#     permission_classes=[IsOwnerProfileOrReadOnly,IsAuthenticated]
 
 
 class RegistrApiView(APIView):
+    """ endpoint регистрация с токеном"""
     permission_classes=[AllowAny]
     serializer_class = RegisterUserSerializer
 
@@ -143,6 +153,7 @@ class RegistrApiView(APIView):
 
 
 class LoginApiView(APIView):
+    """endpoint вход с токеном """
     permission_classes = [AllowAny]
     serializer_class = LoginUserSerializer
 

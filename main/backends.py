@@ -5,7 +5,9 @@ from .models import AdvUser
 
 
 class JWTAuthentication(authentication.BasicAuthentication):
+    """ metod authentication,none if we dont return token, (user,token) - if we return token"""
     authentication_header_prefix='Bearer'
+
     def authenticate(self, request):
         request.user=None
         auth_header=authentication.get_authorization_header(request).split()
