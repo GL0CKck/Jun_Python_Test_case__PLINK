@@ -1,0 +1,20 @@
+{% load bootstrap4 %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h2> Профиль пользователя: {{ user.username }}</h2>
+{% if user.first_name and user.last_name %}
+
+<p> Здравствуйте, {{ user.first_name }} {{ user.last_name }}</p>
+{% else %}
+<p>
+Здравствуйте!
+</p>
+{% endif %}
+<a href="{% url 'main:logout' %}">Выйти</a>
+</body>
+</html>

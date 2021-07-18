@@ -1,0 +1,20 @@
+{% load bootstrap4 %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Добро Пожаловать</title>
+</head>
+<body>
+<h2>Bxoд</h2>
+{% if user.is_authenticated %}
+<p>Вы уже выполнили вход. </p>
+{% else %}
+<form  method="post">
+{% csrf_token %}
+{% bootstrap_form form layout='horizontal' %}
+{% buttons submit='Boйти'%}{% endbuttons %}
+</form>
+{% endif %}
+</body>
+</html>
