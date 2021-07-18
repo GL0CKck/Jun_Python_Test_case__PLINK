@@ -1,12 +1,16 @@
 from django.contrib import admin
-from .models import AdvUser, UserIp
-from .forms import RegisterUserForm, UserIpForm
+from .models import AdvUser, UserIp, UserNotes
+from .forms import RegisterUserForm, UserIpForm, NotesUserForm
 
 # Register your models here.
 
 
 class UserIpLine(admin.TabularInline):
     model = UserIp
+
+
+class NotesUserAdmin(admin.ModelAdmin):
+    form=NotesUserForm
 
 
 class AdvUserAdmin(admin.ModelAdmin):
@@ -21,3 +25,4 @@ class UserIpAdmin(admin.ModelAdmin):
 
 admin.site.register(AdvUser, AdvUserAdmin)
 admin.site.register(UserIp, UserIpAdmin)
+admin.site.register(UserNotes,NotesUserAdmin)

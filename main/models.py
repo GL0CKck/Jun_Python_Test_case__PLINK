@@ -37,7 +37,7 @@ class UserManager(BaseUserManager):
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Staff needs True')
         if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Staff superuser True')
+            raise ValueError('Superuser needs True')
 
         return self._create_user(username,email,password,**extra_fields)
 
@@ -81,7 +81,11 @@ class AdvUser(AbstractBaseUser,PermissionsMixin):
             'exp': int(dt.strftime('%S'))
         }, settings.SECRET_KEY, algorithm='HS256')
 
-        return token.decode('utf-8')
+        return token
+
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
 
 
 class UserIp(models.Model):
@@ -95,8 +99,17 @@ class UserIp(models.Model):
         return self.ip
 
     class Meta:
-        pass
+        verbose_name = 'Айпи'
+        verbose_name_plural = 'Айпи'
 
 
 class UserNotes(models.Model):
-    pass
+    author = models.ForeignKey(AdvUser,on_delete=models.CASCADE,verbose_name='author')
+    notes = models.TextField(verbose_name='Мои Заметки')
+    name_notes = models.CharField(max_length=122,verbose_name='Название заметки',null=True,blank=True)
+    created = models.DateTimeField(auto_now_add=True,db_index=True,verbose_name='Заметка была опубликована: ')
+
+    class Meta:
+        verbose_name = 'Заметка'
+        verbose_name_plural = 'Заметки'
+        ordering = ['-created']

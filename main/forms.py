@@ -1,9 +1,12 @@
 from django.forms import inlineformset_factory
-from .models import AdvUser, UserIp
+from .models import AdvUser, UserIp, UserNotes
 from django import forms
 from django.contrib.auth import password_validation
-
+import jwt
+from datetime import datetime
+from datetime import timedelta
 from django.contrib import messages
+from django.conf import settings
 
 
 class RegisterUserForm(forms.ModelForm):
@@ -18,6 +21,7 @@ class RegisterUserForm(forms.ModelForm):
     first_name = forms.RegexField(label='Имя', regex='^[A-Za-z-]+$')
     last_name = forms.RegexField(label='Фамилия',regex='^[A-Za-z-\s]+$')
 
+
     def valid_pass(self):
         password=self.cleaned_data['password']
         if password:
@@ -30,6 +34,20 @@ class RegisterUserForm(forms.ModelForm):
         if self.cleaned_data.get('password')[0].islower() or self.cleaned_data.get('password')[0].isnumeric():
             raise forms.ValidationError('Обязательно начинаться с прописной буквы.')
         return self.cleaned_data
+
+    @property
+    def token(self):
+        return self._generation_token_jwt()
+
+    def _generation_token_jwt(self):
+        dt = datetime.now() + timedelta(days=60)
+
+        token = jwt.encode({
+            'id': self.pk,
+            'exp': int(dt.strftime('%S'))
+        }, settings.SECRET_KEY, algorithm='HS256')
+
+        return token
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -51,3 +69,10 @@ class UserIpForm(forms.ModelForm):
         fields = '__all__'
         ordering = ['-ip']
         list_filter = ('count_post', 'count_get')
+
+
+class NotesUserForm(forms.ModelForm):
+    class Meta:
+        model = UserNotes
+        fields = '__all__'
+        widgets = {'author':forms.HiddenInput}

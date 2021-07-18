@@ -1,0 +1,18 @@
+{% load  bootstrap4 %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавление заметки - профиль {{ user.username }}</title>
+</head>
+<body>
+<h2>Добавление Заметки</h2>
+<form method="POST" enctype="multipart/form-data">
+  {% csrf_token %}
+{% bootstrap_form form layout='horizontal' %}
+
+  {% buttons submit='Добавить' %}{% endbuttons %}
+
+</form>
+</body>
+</html>

@@ -21,7 +21,7 @@ class AdvUserSerializer(serializers.ModelSerializer):
 
 class RegisterUserSerializer(serializers.ModelSerializer):
     """ регистрация нового юзера (пароль,токен)"""
-    password=serializers.CharField(max_length=16,min_length=7,write_only=True,widget=forms.PasswordInput)
+    password=serializers.CharField(max_length=16,min_length=7,write_only=True)
 
     token=serializers.CharField(max_length=255,read_only=True)
 

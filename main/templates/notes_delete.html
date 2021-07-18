@@ -1,0 +1,16 @@
+{% load bootstrap4 %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Удаление Заметки</title>
+</head>
+<body>
+{{ notes.name_notes}}
+{{ notes.notes }}
+<form method="POST">
+    {% csrf_token %}
+    <input type="submit" value="Удалить">
+</form>
+</body>
+</html>

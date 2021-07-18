@@ -15,6 +15,16 @@
 Здравствуйте!
 </p>
 {% endif %}
+{% for note in notes %}
+{% url 'main:notes_detail'   pk=note.pk as url %}
+{{ note.author }}
+{{ note.notes }}
+{{ note.created }}
+<a href="{% url 'main:notes_detail' pk=note.pk %}{{ url }}{{ all }}">{{ note.name_notes }}</a>
+<a href="{% url 'main:notes_change' pk=note.pk %}">Изменить</a>
+<a href="{% url 'main:notes_delete' pk=note.pk %}">Удалить</a>
+{% endfor %}
+<a href="{% url 'main:notes_add' %}">Создать</a>
 <a href="{% url 'main:logout' %}">Выйти</a>
 </body>
 </html>

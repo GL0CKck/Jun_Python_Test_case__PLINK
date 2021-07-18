@@ -4,9 +4,9 @@ from django.shortcuts import render, redirect
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly,IsAuthenticated
-from .forms import RegisterUserForm
+from .forms import RegisterUserForm, NotesUserForm
 from django.contrib import messages
-from .models import UserIp, AdvUser
+from .models import UserIp, AdvUser, UserNotes
 from .serializers import AdvUserSerializer, AdvUserIpSerializer, RegisterUserSerializer,LoginUserSerializer
 from rest_framework.response import Response
 from rest_framework import status, generics
@@ -36,7 +36,7 @@ def index(request):
 
 
 def registeruserview(request):
-    """ ендпоинт регистрации юзера через фронт и сохранение его в БД"""
+    """ ендпоинт регистрации юзера c JWT token через фронт и сохранение его в БД"""
     if request.method == 'POST':
         form=RegisterUserForm(request.POST)
         if form.is_valid():
@@ -96,10 +96,10 @@ def api_usersip(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# class ApiAdvUser(ModelViewSet):
-#     """ """
-#     queryset = AdvUser.objects.all()
-#     serializer_class = AdvUserSerializer
+class ApiAdvUser(ModelViewSet):
+    """ """
+    queryset = AdvUser.objects.all()
+    serializer_class = AdvUserSerializer
 
 
 class UserLoginView(LoginView):
@@ -110,9 +110,55 @@ class UserLoginView(LoginView):
 @login_required
 def profile(request):
     """ endpoint profile-user """
-    user=get_object_or_404(AdvUser,pk=request.user.pk)
-    context={'user':user}
+    notes=UserNotes.objects.filter(author=request.user.pk)
+    context={'notes':notes}
     return render(request,'profile.html',context)
+
+@login_required()
+def notes_detail(request,pk):
+    notes = get_object_or_404(UserNotes,pk=pk)
+    context={'notes':notes}
+    return render(request,'notes_detail.html',context)
+
+
+@login_required()
+def notes_add(request):
+    if request.method == 'POST':
+        form=NotesUserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('main:profile')
+    else:
+        form=NotesUserForm(initial={'author':request.user.pk})
+    context={'form':form}
+    return render(request,'notes_add.html',context)
+
+
+@login_required()
+def notes_change(request,pk):
+
+    notes=get_object_or_404(UserNotes,pk=pk)
+    if request.method == 'POST':
+        form = NotesUserForm(request.POST,instance=notes)
+        if form.is_valid():
+            notes=form.save()
+            messages.add_message(request, messages.SUCCESS, 'Успешно Изменено')
+        return redirect('main:profile')
+    else:
+        form=NotesUserForm(instance=notes)
+    context={'form':form}
+    return render(request,'notes_change.html',context)
+
+
+@login_required()
+def notes_delete(request,pk):
+    notes=get_object_or_404(UserNotes,pk=pk)
+    if request.method == 'POST':
+        notes.delete()
+        messages.add_message(request,messages.SUCCESS,'Успешно удаленно')
+    else:
+        context = {'notes':notes}
+        return render(request,'notes_delete.html',context)
 
 
 class UserLogoutView(LoginRequiredMixin,LogoutView):
@@ -120,20 +166,20 @@ class UserLogoutView(LoginRequiredMixin,LogoutView):
     template_name = 'logout.html'
 
 
-# class UserProfileCreateView(ListCreateAPIView):
-#     queryset = AdvUser.objects.all()
-#     serializer_class = AdvUserSerializer
-#     permission_classes=[IsAuthenticated]
-#
-#     def perform_create(self, serializer):
-#         user=self.request.user
-#         serializer.save(user=user)
-#
-#
-# class UserProfileDetailView(RetrieveUpdateDestroyAPIView):
-#     queryset = AdvUser.objects.all()
-#     serializer_class = AdvUserSerializer
-#     permission_classes=[IsOwnerProfileOrReadOnly,IsAuthenticated]
+class UserProfileCreateView(ListCreateAPIView):
+    queryset = AdvUser.objects.all()
+    serializer_class = AdvUserSerializer
+    permission_classes=[IsAuthenticated]
+
+    def perform_create(self, serializer):
+        user=self.request.user
+        serializer.save(user=user)
+
+
+class UserProfileDetailView(RetrieveUpdateDestroyAPIView):
+    queryset = AdvUser.objects.all()
+    serializer_class = AdvUserSerializer
+    permission_classes=[IsOwnerProfileOrReadOnly,IsAuthenticated]
 
 
 class RegistrApiView(APIView):
